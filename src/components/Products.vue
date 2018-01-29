@@ -1,3 +1,4 @@
+/* eslint max-len: ["error", { "code": 800 }] */
 <template>
   <div class="row">
     <div class="col-12 col-sm-5 col-md-4 sidebar">
@@ -20,7 +21,7 @@
         <br />
         {{productQttLabel}} {{products[currentProductIndex].qtt}}
         <br />
-        {{selingPriceSugestion}} {{getSugestionSellingPrice()}}
+        {{selingPriceSuggestion}} {{getSuggestionSellingPrice()}}
         <br />
         {{selingPriceSelected}} {{currency}}
         <input v-model="products[currentProductIndex].sellingPrice" />
@@ -32,15 +33,40 @@
       <h3>{{productIngredientsTitle}}</h3>
 
       <ul>
-        <li v-for="i in products[currentProductIndex].ingredients"
+        <li class="row"
+          v-for="i in products[currentProductIndex].ingredients"
           v-bind:key="i.id"
-          v-o:mouseover="modifierTools">
-          {{i.qtt}}
-          {{i.name}}
-          ({{currency}} {{i.price}})
-          <span class="hide">xx</span>
+          @mouseover="i.active = true"
+          @mouseleave="i.active = false">
+          <div v-show="!i.edited">
+            {{i.qtt}}
+            {{i.name}}
+            ({{currency}} {{i.price}})
+          </div>
+          <div v-show="i.edited">
+            <input v-model="i.qtt" />
+            <input v-model="i.name" />
+            <input v-model="i.price" />
+            <span @click="i.edited = false" class="oi oi-check" title="icon done" aria-hidden="true"></span>
+          </div>
+          <div v-show="i.active && !i.edited" class="editor">
+            <span @click="i.edited = true" class="oi oi-pencil" title="icon pencil" aria-hidden="true"></span>
+            <span class="oi oi-trash" title="icon trash" aria-hidden="true"></span>
+          </div>
         </li>
       </ul>
+
+      <h3>{{productProcessingTitle}}</h3>
+      <div
+        @mouseover="products[currentProductIndex].active = true"
+        @mouseleave="products[currentProductIndex].active = false">
+        <div v-show="products[currentProductIndex].active && !products[currentProductIndex].edited" class="editor">
+          <span @click="products[currentProductIndex].edited = true" class="oi oi-pencil" title="icon pencil" aria-hidden="true"></span>
+          <span class="oi oi-trash" title="icon trash" aria-hidden="true"></span>
+        </div>
+
+        <div v-html="products[currentProductIndex].processing" />
+      </div>
 
     </div>
   </div>
@@ -50,13 +76,10 @@
 export default {
   name: 'ProductList',
   beforeMount() {
+    // on the fly var
     this.totalCost = this.getTotalCost();
   },
   methods: {
-    modifierTools() {
-      return `<span class="oi oi-pencil" title="icon pencil" aria-hidden="true"></span>`;
-    },
-
     openDetail(i) {
       this.currentProductIndex = i;
       this.totalCost = this.getTotalCost();
@@ -69,7 +92,7 @@ export default {
       return totalCost.price;
     },
 
-    getSugestionSellingPrice() {
+    getSuggestionSellingPrice() {
       const unitCost = (this.totalCost / this.products[this.currentProductIndex].qtt) * 1;
       return `${this.currency} ${unitCost + (unitCost * 0.20)}`;
     },
@@ -109,21 +132,27 @@ export default {
       productDetailTileSuffix: 'Detil',
       productTotalCost: 'Total pengeluaran:',
       productQttLabel: 'Jumlah produk jadi:',
-      selingPriceSugestion: 'Harga jual persatuan yang disarankan',
+      selingPriceSuggestion: 'Harga jual persatuan yang disarankan',
       selingPriceSelected: 'Harga jual persatuan yang digunakan',
-      productIngredientsTitle: 'Bahan-bahan dan Kebutuhan',
       singleProfitLabel: 'Keuntungan persatuan:',
       totalProfitLabel: 'Keuntungan perproduksi:',
       setPriceText: 'Masukkan harga jual satuan untuk melihat keuntungan.',
+      productIngredientsTitle: 'Bahan-bahan dan Kebutuhan',
+      productProcessingTitle: 'Cara memasak',
       products: [
         {
+          active: false,
+          edited: false,
           name: 'pisang goreng',
           slug: 'pisang-goreng',
           qtt: 20,
           sellingPrice: 0,
+          processing: '<p><em>dipotong</em> dan digoreng</p>',
           ingredients: [
             {
               id: 0,
+              active: false,
+              edited: false,
               name: 'pisang',
               qtt: '10 buah',
               price: 5000,
@@ -131,6 +160,8 @@ export default {
 
             {
               id: 1,
+              active: false,
+              edited: false,
               name: 'tepung',
               qtt: '100gr',
               price: 3000,
@@ -138,6 +169,8 @@ export default {
 
             {
               id: 2,
+              active: false,
+              edited: false,
               name: 'minyak goreng',
               qtt: '1/2 liter',
               price: 15000,
@@ -145,6 +178,8 @@ export default {
 
             {
               id: 3,
+              active: false,
+              edited: false,
               name: 'gas',
               qtt: 'secukupnya',
               price: 6000,
@@ -152,13 +187,18 @@ export default {
           ],
         },
         {
+          active: false,
+          edited: false,
           name: 'tape goreng',
           slug: 'tape',
           qtt: 20,
           sellingPrice: 0,
+          processing: '<p>sama ini juga dipotong dan <br /> digoreng</p>',
           ingredients: [
             {
               id: 0,
+              active: false,
+              edited: false,
               name: 'tape',
               qtt: '2 bungkus',
               price: 7000,
@@ -166,6 +206,8 @@ export default {
 
             {
               id: 1,
+              active: false,
+              edited: false,
               name: 'tepung',
               qtt: '100gr',
               price: 3000,
@@ -173,6 +215,8 @@ export default {
 
             {
               id: 2,
+              active: false,
+              edited: false,
               name: 'minyak goreng',
               qtt: '1/2 liter',
               price: 15000,
@@ -180,6 +224,8 @@ export default {
 
             {
               id: 3,
+              active: false,
+              edited: false,
               name: 'gas',
               qtt: 'secukupnya',
               price: 6000,
