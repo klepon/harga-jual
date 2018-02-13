@@ -1,0 +1,18 @@
+/* Your app styles here */
+@import 'vue-wysiwyg/dist/vueWysiwyg.css';
+
+.icon-bold {
+  font-weight: bold;
+}
+
+.size-15 {
+  font-size: 15px;
+}
+
+.color-blue {
+  color: #2196f3;
+}
+
+.color-red {
+  color: #f44336;
+}
