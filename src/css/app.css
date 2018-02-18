@@ -5,14 +5,23 @@
   font-weight: bold;
 }
 
+.icon-click {
+  cursor: pointer;
+}
+
 .size-15 {
   font-size: 15px;
 }
 
-.color-blue {
-  color: #2196f3;
+.form-container {
+  display: flex;
 }
 
-.color-red {
-  color: #f44336;
+.form-container input {
+  margin-right: 10px;
+  width: 33.33%;
+}
+
+.error {
+  border: solid 1px red;
 }

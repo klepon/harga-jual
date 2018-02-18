@@ -5,8 +5,29 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  // mutations: {
+  //   updateIngredients (state, data) {
+  //     state.products = state.products.map((product, i) => {
+  //       if(i === data.productIndex) {
+  //         return {
+  //           ...product,
+  //           ingredients: state.products[i].ingredients.map((ingredient, i) => {
+  //             if(i === data.ingredientIndex) {
+  //               return data.ingredient;
+  //             }
+  //
+  //             return ingredient;
+  //           })
+  //         }
+  //       }
+  //
+  //       return product;
+  //     })
+  //   }
+  // },
   state: {
     setup: {
+      // edited: -1,
       logo: '/static/logo.png',
       storeName: 'Warung Gorengan',
       currency: 'Rp',
@@ -14,8 +35,9 @@ export default new Vuex.Store({
       productDetailTileSuffix: 'Detil product',
       productTotalCost: 'Total pengeluaran:',
       productQttLabel: 'Jumlah produk jadi:',
-      selingPriceSuggestion: 'Harga jual persatuan yang disarankan',
-      selingPriceSelected: 'Harga jual persatuan yang digunakan',
+      sellingPrice: 'Harga jual persatuan',
+      sellingPriceSuggestion: 'disarankan',
+      sellingPriceSelected: 'digunakan',
       singleProfitLabel: 'Keuntungan persatuan:',
       totalProfitLabel: 'Keuntungan perproduksi:',
       setPriceText: 'Masukkan harga jual satuan untuk melihat keuntungan.',
@@ -26,8 +48,8 @@ export default new Vuex.Store({
       {
         name: 'pisang goreng',
         slug: 'pisang-goreng',
-        qtt: 20,
-        sellingPrice: 0,
+        qtt: 30,
+        sellingPrice: '',
         processing: '<p><em>dipotong</em> dan digoreng</p>',
         ingredients: [
           {
@@ -62,8 +84,8 @@ export default new Vuex.Store({
       {
         name: 'tape goreng',
         slug: 'tape',
-        qtt: 20,
-        sellingPrice: 0,
+        qtt: 25,
+        sellingPrice: '',
         processing: '<p>sama ini juga dipotong dan <br /> digoreng</p>',
         ingredients: [
           {

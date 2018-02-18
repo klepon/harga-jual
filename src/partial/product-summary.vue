@@ -1,15 +1,43 @@
 <template>
   <f7-block>
-    <f7-block-header>{{products[$f7route.params.id].name}}</f7-block-header>
 
-    <p v-bind="products">{{setup.productTotalCost}} {{setup.currency}} {{totalCost}}
+    <detailHeading
+      v-bind:title="products[$f7route.params.id].name"
+      v-bind:isEditSection="isEditSection"
+      v-bind:sectionID="sectionID"
+      v-on:setEditSection="i => $emit('setEditSection', i)"
+    />
+
+    <p>
+      {{setup.productTotalCost}} {{setup.currency}} {{getTotalCost()}}
       <br />
-      {{setup.productQttLabel}} {{products[$f7route.params.id].qtt}}
+
+      {{setup.productQttLabel}}
+      <span v-show="!isItemEdited(0)">
+        {{products[$f7route.params.id].qtt}}
+        <em v-show="isEditSection" @click="$emit('setEditItem', 0)" class="icon icon-bold icon-click size-15 color-blue">edit</em>
+      </span>
+      <span v-show="isItemEdited(0)">
+        <input v-on:keyup.enter="$emit('onSubmit', $event)" v-model="products[$f7route.params.id].qtt" autofocus />
+        <em @click="$emit('setEditItem')" class="icon icon-bold icon-click size-15 color-blue">done</em>
+      </span>
       <br />
-      {{setup.selingPriceSuggestion}} {{getSuggestionSellingPrice()}}
+
+      {{setup.sellingPrice}}:
       <br />
-      {{setup.selingPriceSelected}} {{setup.currency}}
-      <input v-model="products[$f7route.params.id].sellingPrice" />
+
+      &middot; {{setup.sellingPriceSuggestion}} {{getSuggestionSellingPrice()}}
+      <br />
+
+      &middot; {{setup.sellingPriceSelected}} {{setup.currency}}
+        <span v-show="!isItemEdited(1)">
+          {{products[$f7route.params.id].sellingPrice}}
+          <em v-show="isEditSection" @click="$emit('setEditItem', 1)" class="icon icon-bold icon-click size-15 color-blue">edit</em>
+        </span>
+        <span v-show="isItemEdited(1)">
+          <input v-on:keyup.enter="$emit('onSubmit', $event)" v-model="products[$f7route.params.id].sellingPrice" autofocus />
+          <em @click="$emit('setEditItem')" class="icon icon-bold icon-click size-15 color-blue">done</em>
+        </span>
 
       <span v-html="getSingleProfit()" />
       <span v-html="getTotalProfit()" />
@@ -18,17 +46,22 @@
 </template>
 
 <script>
+import helper from '../helper.js';
+import detailHeading from './detail-heading.vue';
+
 export default {
   name: 'product-summary',
-  beforeMount() {
-    this.totalCost = this.getTotalCost();
+  mixins: [helper],
+  props: ['isEditSection', 'sectionID', 'editedItem'],
+  components: {
+    detailHeading,
   },
   methods: {
     getTotalCost() {
       const newTotalCost = (this.products[this.$f7route.params.id].ingredients)
-        .reduce((total, item) => ({ price: (total.price) + (item.price) }));
+        .reduce((total, item) => ({ price: (total.price * 1) + (item.price * 1) }));
 
-      return newTotalCost.price;
+      return this.totalCost = newTotalCost.price;
     },
 
     getSuggestionSellingPrice() {

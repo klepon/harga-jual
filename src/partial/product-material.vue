@@ -1,59 +1,110 @@
 <template>
   <f7-block>
-    <f7-block-header>{{setup.productIngredientsTitle}}</f7-block-header>
-    <div class="row"
-      v-for="i in products[$f7route.params.id].ingredients"
-      v-bind:key="i.id"
-      @mouseover="currentHover = $f7route.params.id +'-'+ i.id"
-      @mouseleave="resetHover()">
-      <div v-show="!isEdited($f7route.params.id +'-'+ i.id)">
-        <i @click="currentEdited = $f7route.params.id +'-'+ i.id" class="f7-icons icon-bold size-15 color-blue">gear_fill</i>
 
+    <detailHeading
+      v-bind:title="setup.productIngredientsTitle"
+      v-bind:isEditSection="isEditSection"
+      v-bind:sectionID="sectionID"
+      v-on:setEditSection="i => $emit('setEditSection', i)"
+    />
+
+    <div class="row" v-for="i in products[$f7route.params.id].ingredients"
+      v-bind:key="i.id"
+      >
+      <div v-show="!isItemEdited($f7route.params.id +'-'+ i.id)">
         {{i.qtt}}
         {{i.name}}
         ({{setup.currency}} {{i.price}})
+
+        <em v-show="isEditSection" @click="$emit('setEditItem', $f7route.params.id +'-'+ i.id)" class="icon icon-bold icon-click size-15 color-blue">edit</em>
       </div>
 
-      <div v-show="isEdited($f7route.params.id +'-'+ i.id)">
-        <input v-model="i.qtt" />
-        <input v-model="i.name" />
-        <input v-model="i.price" />
-        <i @click="resetEdited()" class="f7-icons icon-bold size-15 color-blue">check</i>
-      </div>
-
-      <div v-show="isHover($f7route.params.id +'-'+ i.id)" class="editor">
-        <i @click="currentEdited = $f7route.params.id +'-'+ i.id" class="f7-icons icon-bold size-15 color-blue">compose</i>
-        <i class="f7-icons size-15 color-red">trash</i>
+      <div v-show="isItemEdited($f7route.params.id +'-'+ i.id)" class="form-container">
+        <input v-on:keyup.enter="$emit('onSubmit', $event)" v-model="i.qtt" />
+        <input v-on:keyup.enter="$emit('onSubmit', $event)" v-model="i.name" />
+        {{setup.currency}}
+        <input v-on:keyup.enter="$emit('onSubmit', $event)" v-model="i.price" autofocus />
+        <em @click="$emit('setEditItem')" class="icon icon-bold icon-click size-15 color-blue">done</em>
       </div>
     </div>
+
+    <em
+      v-show="!isItemEdited($f7route.params.id +'--0') && isEditSection"
+      @click="$emit('setEditItem', $f7route.params.id +'--0')"
+      class="icon icon-bold icon-click size-15 color-blue">add</em>
+
+    <div v-show="isItemEdited($f7route.params.id +'--0')" class="form-container">
+      <input v-on:keyup.enter="onSubmit" v-model="newItem.qtt" :class="error.qtt" placeholder="Jumlah" />
+      <input v-on:keyup.enter="onSubmit" v-model="newItem.name" :class="error.name" placeholder="Bahan-bahan" />
+      {{setup.currency}}
+      <input v-on:keyup.enter="onSubmit" v-model="newItem.price" :class="error.price" placeholder="Harga" />
+      <em @click="save()" class="icon icon-bold icon-click size-15 color-blue">done</em>
+    </div>
+
   </f7-block>
 
 </template>
 
 <script>
+import helper from '../helper.js';
+import detailHeading from './detail-heading.vue';
+
 export default {
   name: 'product-material',
+  mixins: [helper],
+  props: ['isEditSection', 'sectionID', 'editedItem'],
+  components: {
+    detailHeading,
+  },
   methods: {
-    isHover(id) {
-      return id === this.currentHover && id !== this.currentEdited;
+    onSubmit(event) {
+      event.preventDefault();
+      this.saveData();
     },
 
-    isEdited(id) {
-      return id === this.currentEdited;
-    },
+    saveData() {
+      // console.log(this.newItem.qtt);
+      // console.log(this.newItem.name);
+      // console.log(this.newItem.price);
 
-    resetHover() {
-      this.currentHover = -1;
-    },
+      // if incomplate, show error
+      this.error.qtt = this.newItem.qtt === '' ? 'error' : '';
+      this.error.name = this.newItem.name === '' ? 'error' : '';
+      this.error.price = this.newItem.price === '' ? 'error' : '';
 
-    resetEdited() {
-      this.currentEdited = -1;
-    },
+      if (
+        this.newItem.qtt === '' ||
+        this.newItem.name === '' ||
+        this.newItem.price === ''
+      ) return false;
+
+      // if complete, do save
+      // TODO: save data
+      alert('save data here');
+
+      // reset form and close
+      this.newItem = {
+        qtt:'',
+        name:'',
+        price:'',
+      };
+
+      return true;
+    }
   },
   data() {
     return {
-      currentHover: -1,
-      currentEdited: -1,
+      newItem: {
+        qtt:'',
+        name:'',
+        price:'',
+      },
+      error: {
+        qtt:'',
+        name:'',
+        price:'',
+      },
+      edited: this.$store.state.setup.edited,
       setup: this.$store.state.setup,
       products: this.$store.state.products,
     }
